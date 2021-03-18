@@ -24,7 +24,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-cmake_minimum_required(VERSION 2.8) 
+cmake_minimum_required(VERSION 3.5) 
 
 get_filename_component(PROJNAME ${CMAKE_CURRENT_SOURCE_DIR} NAME)
 Project(${PROJNAME})
@@ -35,41 +35,27 @@ Message(STATUS "Processing Project ${PROJNAME}:")
 # If this is built as part of a larger nvpro-samples build, use the appropriate
 # bin_${ARCH} directory.
 # look for shared_sources 1) as a sub-folder 2) at some other locations
-# this cannot be put anywhere else since we still didn't find CMakeLists_include.txt yet
+# this cannot be put anywhere else since we still didn't find setup.cmake yet
 #
-if(NOT BASE_DIRECTORY) # if not defined, it means this cmake file was called as the first entry point and not included
-  # check if the external repository is outside or inside the project (as a sub-module)
-  # testing the file CMakeLists_include.txt because when sub-modules are not cloned, the folders are still there...
-  # we also assume here that if shared_sources is there, shared_external is, too...
-  SET(ADD_SUBDIR_BELOW 1)
-  if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/shared_sources/CMakeLists_include.txt)
-    Message(STATUS "found sub-folder shared_sources")
-    SET(BASE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-    INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/shared_sources/CMakeLists_include.txt)
-  elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../../shared_sources)
-    SET(BASE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../..)
-    INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/../../shared_sources/CMakeLists_include.txt)
-  elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../../../shared_sources)
-    SET(BASE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../..)
-    INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/../../../shared_sources/CMakeLists_include.txt)
-  elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../shared_sources)
-    SET(BASE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/..)
-    INCLUDE(${CMAKE_CURRENT_SOURCE_DIR}/../shared_sources/CMakeLists_include.txt)
-  endif()
-  
-  if(BASE_DIRECTORY)
-    _add_project_definitions(${PROJNAME})
-  endif()
-endif()
+if(NOT BASE_DIRECTORY)
 
-# Fix directory separators in a TeamCity continuous integration context
-if(CUDA_TOOLKIT_ROOT_DIR)
-  string(REPLACE "\\" "/" CUDA_TOOLKIT_ROOT_DIR ${CUDA_TOOLKIT_ROOT_DIR})
+  find_path(BASE_DIRECTORY
+    NAMES shared_sources/cmake/setup.cmake
+    PATHS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/.. ${CMAKE_CURRENT_SOURCE_DIR}/../.. 
+    REQUIRED
+    DOC "Directory containing shared_sources"
+    )
 endif()
+if(EXISTS ${BASE_DIRECTORY}/shared_sources/cmake/setup.cmake)
+  include(${BASE_DIRECTORY}/shared_sources/cmake/setup.cmake)
+else()
+  message(FATAL_ERROR "could not find base directory, please set BASE_DIRECTORY to folder containing shared_sources")
+endif()
+  
+_add_project_definitions(${PROJNAME})
 
 # Find NVML.
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
-find_package(NVML REQUIRED)
+_add_package_NVML()
 
 add_executable(${PROJNAME} main.cpp loadNVML.h loadNVML.cpp)
 include_directories(${PROJNAME} "${NVML_INCLUDE_DIRS}") # target_include_directories was added in CMake 3.0.2
