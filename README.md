@@ -48,7 +48,11 @@ Determining which GPUs are Enterprise or Quadro GPUs takes five steps:
 - Call `nvmlInit()` to initialize NVML.
 - Call `nvmlDeviceGetCount` to get the number of NVIDIA GPUs. Then for each index from 0 to the count minus one:
   - Call `nvmlDeviceGetHandleByIndex` to get the `nvmlDevice_t` device from the index.
-  - Call `nvmlDeviceGetBrand` with the device to get an `nvmlBrandType_t` brand. If this is `NVML_BRAND_QUADRO`, then the device is an Enterprise or Quadro GPU.
+  - Call `nvmlDeviceGetBrand` with the device to get an `nvmlBrandType_t` brand. If this is `NVML_BRAND_QUADRO`, `NVML_BRAND_NVIDIA_VAPPS`, or `NVML_BRAND_NVIDIA_RTX`, then the device is an Enterprise or Quadro GPU.
+
+| ***Some Info about the `nvmlBrandType_t` Enum***             |
+| ------------------------------------------------------------ |
+| Recent drivers (R460+) now return the `NVML_BRAND_NVIDIA_VAPPS` (7) and `NVML_BRAND_QUADRO_RTX` (12) values of `nvmlBrandType_t` from `nvmlDeviceGetBrand` for Enterprise or Quadro GPUs. These new enum values are included in CUDA SDK 11.2.2. `NVML_BRAND_NVIDIA_VAPPS` is returned when using a [virtual Quadro GPU](https://www.nvidia.com/en-us/data-center/virtual-solutions/) without GPU passthrough, `NVML_BRAND_QUADRO_RTX` is returned in other cases on newer drivers, and older drivers return `NVML_BRAND_QUADRO`. |
 
 The last four steps are usually straightforward, but the first step can be a bit more complex on Windows. We describe how to load NVML below.
 
@@ -64,4 +68,4 @@ We show one way to implement loading NVML correctly in [`loadNVML.cpp`](loadNVML
 
 This sample requires CMake, and a version of the CUDA Toolkit (for NVML). To build this sample, configure and generate the project using CMake on `CMakeLists.txt`. (This should automatically find NVML on your system.) Then build and run the program.
 
-This sample doesn't depend on the [NVIDIA DesignWorks Samples'](https://github.com/nvpro-samples) [`shared_sources`](https://github.com/nvpro-samples/shared_sources) project — but if it is built along with `shared_sources` (for instance, using [`build_all`](https://github.com/nvpro-samples/build_all)), then it will automatically use the same build and install directories as the rest of the nvpro-samples.
+This sample doesn't depend on the [NVIDIA DesignWorks Samples'](https://github.com/nvpro-samples) [`nvpro_core`](https://github.com/nvpro-samples/nvpro_core) project — but if it is built along with `nvpro_core` (for instance, using [`build_all`](https://github.com/nvpro-samples/build_all)), then it will automatically use the same build and install directories as the rest of the nvpro-samples.
