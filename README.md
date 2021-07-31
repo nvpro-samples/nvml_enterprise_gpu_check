@@ -52,7 +52,7 @@ Determining which GPUs are Enterprise or Quadro GPUs takes five steps:
 
 | ***Some Info about the `nvmlBrandType_t` Enum***             |
 | ------------------------------------------------------------ |
-| Recent drivers (R460+) now return the `NVML_BRAND_NVIDIA_VAPPS` (7) and `NVML_BRAND_QUADRO_RTX` (12) values of `nvmlBrandType_t` from `nvmlDeviceGetBrand` for Enterprise or Quadro GPUs. These new enum values are included in CUDA SDK 11.2.2. `NVML_BRAND_NVIDIA_VAPPS` is returned when using a [virtual Quadro GPU](https://www.nvidia.com/en-us/data-center/virtual-solutions/) without GPU passthrough, `NVML_BRAND_QUADRO_RTX` is returned in other cases on newer drivers, and older drivers return `NVML_BRAND_QUADRO`. |
+| Recent drivers (R460+) now return the `NVML_BRAND_NVIDIA_VAPPS` (7), `NVML_BRAND_QUADRO_RTX` (12), and `NVML_BRAND_NVIDIA_RTX` (13) values of `nvmlBrandType_t` from `nvmlDeviceGetBrand` for Enterprise or Quadro GPUs. These new enum values are included in CUDA SDK 11.2.2. `NVML_BRAND_NVIDIA_VAPPS` is returned when using a [virtual Quadro GPU](https://www.nvidia.com/en-us/data-center/virtual-solutions/) without GPU passthrough, older drivers return `NVML_BRAND_QUADRO`, newer drivers with pre-Ampere Enterprise GPUs (e.g. Quadro RTX 6000s) return `NVML_BRAND_QUADRO_RTX`, and newer drivers with Ampere+ Enterprise GPUs (e.g. RTX A6000s) return `NVML_BRAND_NVIDIA_RTX`. |
 
 The last four steps are usually straightforward, but the first step can be a bit more complex on Windows. We describe how to load NVML below.
 

@@ -118,7 +118,7 @@ int main()
         nvmlBrandType_t brand_type = NVML_BRAND_UNKNOWN;
         CheckNVMLErrors(nvmlDeviceGetBrand(device, &brand_type));
         const bool is_enterprise_or_quadro = (brand_type == NVML_BRAND_QUADRO) || (brand_type == NVML_BRAND_NVIDIA_VAPPS)
-                                             || (brand_type == NVML_BRAND_QUADRO_RTX);
+                                             || (brand_type == NVML_BRAND_QUADRO_RTX) || (brand_type == NVML_BRAND_NVIDIA_RTX);
 
         std::cout << "\tIs Enterprise/Quadro GPU: " << (is_enterprise_or_quadro ? "Yes" : "No") << "\n";
       }
